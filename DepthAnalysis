@@ -1,0 +1,47 @@
+boundaries = bwboundaries(rb3,'noholes');
+X=boundaries(3,1); %Change first number in order to obtain border in question
+Y=X{1,1};
+I = find(Y(:,2)==max(Y(:,2)));
+Yx=min(I); %finds where the border turns to an edge
+plot(Y(1:Yx,2),Y(1:Yx,1))
+maxy = min((Y(1:Yx,1)));  
+%maxy=57.59;   %This is where you type in the value you found from measuring in Image viewer
+Z = (Y(1:Yx,1))-maxy;
+hold on
+line('Xdata', [0 Yx],'Ydata', [maxy maxy])
+hold off
+Micro_per_pixel = 500/80;%second number is for scale bar pixels
+DifferenceY = Z*Micro_per_pixel;
+figure2=figure;
+Xunit= (Y(1:Yx,2))*Micro_per_pixel;
+DifferenceX=min(Xunit);
+Xunits=(Y(1:Yx,2))*Micro_per_pixel-DifferenceX;
+plot(Xunits,DifferenceY)
+MaxCoated=max(Xunits);
+% lowerbound=2000; %sets lower and upper bounds of the x scale to linearize
+% upperbound=6000;
+% unos=zeros(length(Xunits(lowerbound:upperbound)),1);
+% unos(:,1)=1;
+% X=[unos Xunits(lowerbound:upperbound)];
+% B=X\DifferenceY(lowerbound:upperbound);  %generates solution matrix that carries the slope of the edge of the sample
+% theta=-atan(B(2)); %theta is the angle of rotation...may be hard coded...USE THIS COMMENTED OUT SECTION IF IMAGE NEEDS ROTATING 
+% rotate=[cos(theta) -sin(theta);sin(theta) cos(theta)];
+% flat=[Xunits DifferenceY]*rotate; %rotates DifferenceY matrix...should be flat
+% maxy2=min(flat(:,2));
+% figure
+% plot(flat(:,1),flat(:,2)-maxy2)
+% corrLength=flat(:,2)-maxy2;
+name=strcat(location,'_histogram');
+figure3=figure;
+histogram(DifferenceY) %use 'DifferenceY' matrix if pic does not need rotating, use 'CorrLength' matrix' if it does
+title('INPUT TITLE HERE') %Title for Histogram chart
+xlabel('Damage Depth ({\mu}m)')
+ylabel('Frequency') 
+saveas(figure3,'name_histogram.jpg')
+MaxCorr=max(DifferenceY)%max corrosion damage...use 'DifferenceY' matrix if pic does not need rotating, use 'CorrLength' matrix' if it does
+MeanCorr=mean(DifferenceY)%mean corrosion damage...use 'DifferenceY' matrix if pic does not need rotating, use 'CorrLength' matrix' if it does
+filename='Input Name.xlsx'; %change name here for excel sheet
+xlswrite(filename,Xunits,'Sheet2','A1');
+xlswrite(filename,DifferenceY,'Sheet2','B1');
+M=[Xunits,DifferenceY];
+csvwrite('Input Name',M,0,2);
