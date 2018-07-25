@@ -1,0 +1,13 @@
+location='BareB7';%file path minus type extension goes here
+pic=strcat(location,'.png');%change this extension if the file is not a jpg
+img = imread(pic);%this reads a file ( you must type in the file name and be sure that it is in the same folder as this script)
+I = rgb2gray(img); %changes image from rgb color scheme to gray
+[x,map] = gray2ind(I,100); %take the image and maps the gray scale to 100 different shades
+bw2=im2bw(x,map,0.45); % takes the gray scale and makes it black and white
+wb = imcomplement(bw2); %changes the image to white and black (inverse the black and white)
+regionwb=bwareaopen(wb,300); %this takes     any area that is 350 pixels or less and fills it with black you can see this from figure 1 to 2
+region_borders1 = imdilate(regionwb,ones(3,3)) > imerode(regionwb,ones(2,3)); %this will make the border of the image 
+region_borders2 = bwareaopen(region_borders1,300);%Found this way to be a better way of producing the border Included previous version to show you the difference
+rb3=imcomplement(region_borders2);
+figure1=figure;
+imshow(rb3,'InitialMagnification', 'fit')
